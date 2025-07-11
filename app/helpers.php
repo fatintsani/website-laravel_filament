@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\partner;
 use App\Models\section;
 use App\Models\setting;
 
@@ -19,4 +20,9 @@ function get_section_data($key)
     if (isset($data)) {
         return $data;
     } 
+}
+
+function get_partner() {
+    $data = partner::all();
+    return $data;
 }

@@ -1,6 +1,17 @@
 @php
     $site_name = get_setting_value('site_name');
     $jumbotron = get_section_data('JUMBOTRON');
+    $location = get_setting_value('location');
+    $site_description = get_setting_value('site_description');
+
+    $youtube = get_setting_value('youtube');
+    $instagram = get_setting_value('instagram');
+    $x = get_setting_value('x');
+    $facebook = get_setting_value('facebook');
+
+    $about = get_section_data('ABOUT');
+
+    $partner = get_partner();
 @endphp
 
 <!DOCTYPE html>
@@ -77,18 +88,27 @@
             </div>
             <!-- Partner Grid Items-->
             <div class="row justify-content-center">
-                <!-- Partner Item 1-->
-                <div class="col-md-6 col-lg-4 mb-5">
-                    <div class="portfolio-item mx-auto" data-bs-toggle="modal" data-bs-target="#portfolioModal1">
-                        <div
-                            class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            <div class="portfolio-item-caption-content text-center text-white"><i
-                                    class="fas fa-plus fa-3x"></i></div>
+                @php
+                    $i = 1;
+                @endphp
+                @foreach ($partner as $item)
+                    <!-- Partner Item i -->
+                    <div class="col-md-6 col-lg-4 mb-5">
+                        <div class="portfolio-item mx-auto" data-bs-toggle="modal"
+                            data-bs-target="#portfolioModal{{ $i }}">
+                            <div
+                                class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
+                                <div class="portfolio-item-caption-content text-center text-white"><i
+                                        class="fas fa-plus fa-3x"></i></div>
+                            </div>
+                            <img class="img-fluid" src="{{ Storage::url($item->thumbnail) }}" alt="..." />
                         </div>
-                        <img class="img-fluid" src="assets/img/partner/cabin.png" alt="..." />
                     </div>
-                </div>
-                <!-- last partner 1-->
+                    <!-- last partner 1-->
+                    @php
+                        $i++;
+                    @endphp
+                @endforeach
             </div>
         </div>
     </section>
@@ -96,7 +116,7 @@
     <section class="page-section bg-primary text-white mb-0" id="about">
         <div class="container">
             <!-- About Section Heading-->
-            <h2 class="page-section-heading text-center text-uppercase text-white">About</h2>
+            <h2 class="page-section-heading text-center text-uppercase text-white">{{ $about->title }}</h2>
             <!-- Icon Divider-->
             <div class="divider-custom divider-light">
                 <div class="divider-custom-line"></div>
@@ -105,13 +125,10 @@
             </div>
             <!-- About Section Content-->
             <div class="row">
-                <div class="col-lg-3 ms-auto text-center"><img src="assets/img/about.png" class="w-75" /></div>
+                <div class="col-lg-3 ms-auto text-center"><img src="{{ Storage::url($about->thumbnail) }}"
+                        class="w-75" /></div>
                 <div class="col-lg-5 me-auto lead">
-                    <p>Freelancer is a free bootstrap theme created by Start Bootstrap. The download includes the
-                        complete source files including HTML, CSS, and JavaScript as well as optional SASS stylesheets
-                        for easy customization.</p>
-                    <p>You can create your own custom avatar for the masthead, change the icon in the dividers, and add
-                        your email address to the contact form to make it fully functional!</p>
+                    {!! strip_tags($about->content) !!}
                 </div>
             </div>
         </div>
@@ -124,30 +141,37 @@
                 <div class="col-lg-4 mb-5 mb-lg-0">
                     <h4 class="text-uppercase mb-4">Location</h4>
                     <p class="lead mb-0">
-                        2215 John Daniel Drive
-                        <br />
-                        Clark, MO 65243
+                        {{ $location }}
                     </p>
                 </div>
                 <!-- Footer Social Icons-->
                 <div class="col-lg-4 mb-5 mb-lg-0">
                     <h4 class="text-uppercase mb-4">Around the Web</h4>
-                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i
-                            class="fab fa-fw fa-youtube"></i></a>
-                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i
-                            class="fab fa-fw fa-instagram"></i></a>
-                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i
-                            class="fab fa-fw fa-twitter"></i></a>
-                    <a class="btn btn-outline-light btn-social mx-1" href="#!"><i
-                            class="fab fa-fw fa-facebook-f"></i></a>
+                    @if ($youtube)
+                        <a class="btn btn-outline-light btn-social mx-1" href="{{ $youtube }}" target="blank"><i
+                                class="fab fa-fw fa-youtube"></i></a>
+                    @endif
+
+                    @if ($instagram)
+                        <a class="btn btn-outline-light btn-social mx-1" href="{{ $instagram }}"
+                            target="blank"><i class="fab fa-fw fa-instagram"></i></a>
+                    @endif
+
+                    @if ($x)
+                        <a class="btn btn-outline-light btn-social mx-1" href="{{ $x }}"
+                            target="blank"><i class="fab fa-fw fa-twitter"></i></a>
+                    @endif
+
+                    @if ($facebook)
+                        <a class="btn btn-outline-light btn-social mx-1" href="{{ $facebook }}"
+                            target="blank"><i class="fab fa-fw fa-facebook"></i></a>
+                    @endif
                 </div>
                 <!-- Footer About Text-->
                 <div class="col-lg-4">
-                    <h4 class="text-uppercase mb-4">About Freelancer</h4>
+                    <h4 class="text-uppercase mb-4">About Sites</h4>
                     <p class="lead mb-0">
-                        Freelance is a free to use, MIT licensed Bootstrap theme created by
-                        <a href="http://startbootstrap.com">Start Bootstrap</a>
-                        .
+                        {!! strip_tags($site_description) !!}
                     </p>
                 </div>
             </div>
@@ -158,8 +182,13 @@
         <div class="container"><small>Copyright &copy; {{ $site_name }}</small></div>
     </div>
     <!-- Partner Modals-->
-    <!-- Partner Modal 1-->
-    <div class="portfolio-modal modal fade" id="portfolioModal1" tabindex="-1" aria-labelledby="portfolioModal1"
+    @php
+        $i =1;
+    @endphp
+
+    @foreach ($partner as $item)
+    <!-- Partner Modal i-->
+    <div class="portfolio-modal modal fade" id="portfolioModal{{ $i }}" tabindex="-1" aria-labelledby="portfolioModal1{{ $i }}"
         aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -170,7 +199,7 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-8">
                                 <!-- Partner Modal - Title-->
-                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">Log Cabin</h2>
+                                <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0">{{ $item->title }}</h2>
                                 <!-- Icon Divider-->
                                 <div class="divider-custom">
                                     <div class="divider-custom-line"></div>
@@ -178,12 +207,13 @@
                                     <div class="divider-custom-line"></div>
                                 </div>
                                 <!-- Partner Modal - Image-->
-                                <img class="img-fluid rounded mb-5" src="assets/img/partner/cabin.png"
+                                <img class="img-fluid rounded mb-5" src="{{ Storage::url($item->thumbnail) }}"
                                     alt="..." />
                                 <!-- Partner Modal - Text-->
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda
-                                    ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit
-                                    asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+                                <p>{!! strip_tags($item->content) !!}</p>
+                                <div class="m-5">
+                                    Link: <a href="{{ $item->link }}" target="_blank">{{ $item->link }}</a>
+                                </div>
                                 <button class="btn btn-primary" data-bs-dismiss="modal">
                                     <i class="fas fa-xmark fa-fw"></i>
                                     Close Window
@@ -195,6 +225,10 @@
             </div>
         </div>
     </div>
+    @php
+        $i++;
+    @endphp
+    @endforeach
 
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
